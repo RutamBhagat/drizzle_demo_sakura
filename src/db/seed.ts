@@ -1,5 +1,5 @@
 // src/db/seed.ts
-import { profiles, users } from "./schema";
+import { posts, profiles, users } from "./schema";
 import { faker } from "@faker-js/faker";
 import * as dotenv from "dotenv";
 import { db } from ".";
@@ -12,7 +12,6 @@ const main = async () => {
 
   for (let index = 1; index <= 20; index++) {
     userArr.push({
-      id: index,
       fullName: faker.person.fullName(),
       phone: faker.phone.number(),
       address: faker.location.streetAddress({ useFullAddress: true }),
@@ -24,15 +23,24 @@ const main = async () => {
 
   for (let index = 1; index <= 20; index++) {
     profileArr.push({
-      id: index,
       bio: faker.person.bio(),
       userId: index,
+    });
+  }
+
+  const postsArr: (typeof posts.$inferInsert)[] = [];
+
+  for (let index = 1; index <= 100; index++) {
+    postsArr.push({
+      text: faker.lorem.paragraph(),
+      authorId: +faker.finance.amount(1, 20, 0),
     });
   }
 
   console.log("Seed start");
   await db.insert(users).values(userArr);
   await db.insert(profiles).values(profileArr);
+  await db.insert(posts).values(postsArr);
   console.log("Seed done");
   process.exit(0);
 };

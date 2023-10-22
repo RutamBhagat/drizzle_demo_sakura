@@ -11,8 +11,11 @@ export async function GET(req: NextRequest) {
   const result = await db.query.users.findMany({
     with: {
       profile: true,
+      posts: true,
     },
   });
 
-  return new Response(JSON.stringify(result));
+  const posts = result.map((user) => user.posts);
+
+  return new Response(JSON.stringify(posts));
 }
