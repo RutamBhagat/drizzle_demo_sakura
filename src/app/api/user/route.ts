@@ -8,14 +8,44 @@ export async function GET(req: NextRequest) {
 
   // const result = await db.select().from(users).where(eq(users.id, +user_id));
 
-  const result = await db.query.users.findMany({
+  // const result = await db.query.users.findMany({
+  //   with: {
+  //     profile: true,
+  //     posts: true,
+  //   },
+  // });
+
+  // const post = await db.query.posts.findFirst({
+  //   with: {
+  //     author: true,
+  //     postCategories: true,
+  //   },
+  // });
+
+  const post = await db.query.posts.findFirst({
     with: {
-      profile: true,
-      posts: true,
+      author: true,
+      postCategories: {
+        columns: {
+          categoryId: false,
+          postId: false,
+        },
+        with: {
+          category: {
+            columns: {
+              name: true,
+            },
+          },
+        },
+      },
     },
   });
 
-  const posts = result.map((user) => user.posts);
+  // const cartegory = await db.query.categories.findFirst({
+  //   with: {
+  //     posts: true,
+  //   },
+  // });
 
-  return new Response(JSON.stringify(posts));
+  return new Response(JSON.stringify({ post }));
 }

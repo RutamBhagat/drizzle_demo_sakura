@@ -1,5 +1,5 @@
 import { relations } from "drizzle-orm";
-import { integer, pgTable, serial, text, varchar } from "drizzle-orm/pg-core";
+import { integer, pgTable, primaryKey, serial, text, varchar } from "drizzle-orm/pg-core";
 
 // Tables
 export const users = pgTable("users", {
@@ -26,6 +26,30 @@ export const posts = pgTable("posts", {
     .references(() => users.id),
 });
 
+export const categories = pgTable("categories", {
+  id: serial("id").primaryKey(),
+  name: varchar("name", { length: 256 }),
+});
+
+// Note this is a join table
+// For many to many relations, we need to create a join table
+// Note that the primary key is a composite key of postId and categoryId
+// You should not add it manually
+export const postOnCategories = pgTable(
+  "post_categories",
+  {
+    postId: integer("post_id")
+      .notNull()
+      .references(() => posts.id),
+    categoryId: integer("category_id")
+      .notNull()
+      .references(() => categories.id),
+  },
+  (t) => ({
+    pk: primaryKey(t.postId, t.categoryId),
+  })
+);
+
 // Relations
 // Note: Its a good idea to declare all the relations after declaring all the tables.
 export const userRelations = relations(users, ({ one, many }) => ({
@@ -36,9 +60,25 @@ export const userRelations = relations(users, ({ one, many }) => ({
   posts: many(posts),
 }));
 
-export const postRelations = relations(posts, ({ one }) => ({
+export const postRelations = relations(posts, ({ one, many }) => ({
   author: one(users, {
     fields: [posts.authorId],
     references: [users.id],
+  }),
+  postCategories: many(postOnCategories),
+}));
+
+export const categoryRelations = relations(categories, ({ many }) => ({
+  posts: many(postOnCategories),
+}));
+
+export const postOnCategoryRelations = relations(postOnCategories, ({ one }) => ({
+  post: one(posts, {
+    fields: [postOnCategories.postId],
+    references: [posts.id],
+  }),
+  category: one(categories, {
+    fields: [postOnCategories.categoryId],
+    references: [categories.id],
   }),
 }));
