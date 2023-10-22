@@ -6,6 +6,7 @@ import {
   date,
   decimal,
   doublePrecision,
+  integer,
   interval,
   json,
   pgEnum,
@@ -21,6 +22,7 @@ export const users = pgTable("users", {
   fullName: text("full_name"),
   phone: varchar("phone", { length: 256 }),
   address: varchar("address", { length: 256 }),
+  score: integer("score"),
 });
 
 export const moodEnum = pgEnum("moodEnum", ["sad", "ok", "happy"]);
