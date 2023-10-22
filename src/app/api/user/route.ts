@@ -1,6 +1,4 @@
 import { db } from "@/db";
-import { users } from "@/db/schema";
-import { eq } from "drizzle-orm";
 import { NextRequest } from "next/server";
 
 export async function GET(req: NextRequest) {
@@ -8,6 +6,13 @@ export async function GET(req: NextRequest) {
 
   const user_id = url.searchParams.get("user_id") as string;
 
-  const result = await db.select().from(users).where(eq(users.id, +user_id));
+  // const result = await db.select().from(users).where(eq(users.id, +user_id));
+
+  const result = await db.query.users.findMany({
+    with: {
+      profile: true,
+    },
+  });
+
   return new Response(JSON.stringify(result));
 }
