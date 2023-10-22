@@ -1,4 +1,3 @@
-// src/db/seed.ts
 import { categories, postOnCategories, posts, profiles, users } from "./schema";
 import { faker } from "@faker-js/faker";
 import * as dotenv from "dotenv";
