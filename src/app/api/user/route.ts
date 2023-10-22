@@ -1,14 +1,13 @@
 import { db } from "@/db";
 import { users } from "@/db/schema";
-import { eq, ne } from "drizzle-orm";
+import { eq } from "drizzle-orm";
+import { NextRequest } from "next/server";
 
-// type Props = {
-//   searchParams: {
-//     user_id: string;
-//   };
-// };
+export async function GET(req: NextRequest) {
+  const url = new URL(req.url);
 
-export async function GET() {
-  const result = await db.select().from(users).where(eq(users.id, +2));
+  const user_id = url.searchParams.get("user_id") as string;
+
+  const result = await db.select().from(users).where(eq(users.id, +user_id));
   return new Response(JSON.stringify(result));
 }
